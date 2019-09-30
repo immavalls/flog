@@ -32,7 +32,7 @@ func Generate(option *Option) error {
 			if delay > 0 {
 				time.Sleep(delay)
 			}
-			log := NewLog(option.Format, created)
+			log := NewLog(option.Format, option.Style, created)
 			writer.Write([]byte(log + "\n"))
 			created = created.Add(time.Duration(option.Sleep*float64(time.Second/time.Millisecond)) * time.Millisecond)
 		}
@@ -44,7 +44,7 @@ func Generate(option *Option) error {
 			if delay > 0 {
 				time.Sleep(delay)
 			}
-			log := NewLog(option.Format, created)
+			log := NewLog(option.Format, option.Style, created)
 			writer.Write([]byte(log + "\n"))
 
 			if (option.Type != "stdout") && (option.SplitBy > 0) && (line > option.SplitBy*splitCount) {
@@ -65,7 +65,7 @@ func Generate(option *Option) error {
 			if delay > 0 {
 				time.Sleep(delay)
 			}
-			log := NewLog(option.Format, created)
+			log := NewLog(option.Format, option.Style, created)
 			writer.Write([]byte(log + "\n"))
 
 			bytes += len(log)
@@ -112,20 +112,20 @@ func NewWriter(logType string, logFileName string) (io.WriteCloser, error) {
 }
 
 // NewLog creates a log for given format
-func NewLog(format string, t time.Time) string {
+func NewLog(format string, logStyle string, t time.Time) string {
 	switch format {
 	case "apache_common":
-		return NewApacheCommonLog(t)
+		return NewApacheCommonLog(t, logStyle)
 	case "apache_combined":
-		return NewApacheCombinedLog(t)
+		return NewApacheCombinedLog(t, logStyle)
 	case "apache_error":
-		return NewApacheErrorLog(t)
+		return NewApacheErrorLog(t, logStyle)
 	case "rfc3164":
-		return NewRFC3164Log(t)
+		return NewRFC3164Log(t, logStyle)
 	case "rfc5424":
-		return NewRFC5424Log(t)
+		return NewRFC5424Log(t, logStyle)
 	case "common_log":
-		return NewCommonLogFormat(t)
+		return NewCommonLogFormat(t, logStyle)
 	default:
 		return ""
 	}

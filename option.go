@@ -17,6 +17,7 @@ Version: %s
 
 Options:
   -f, --format string      choose log format. ("apache_common"|"apache_combined"|"apache_error"|"rfc3164"|"rfc5424") (default "apache_common")
+  -y, --style string       choose format style. ("plain"|"json"). Defaults to plain text.
   -o, --output string      output filename. Path-like is allowed. (default "generated.log")
   -t, --type string        log output type. ("stdout"|"log"|"gz") (default "stdout")
   -n, --number integer     number of lines to generate.
@@ -32,11 +33,13 @@ Options:
 `
 
 var validFormats = []string{"apache_common", "apache_combined", "apache_error", "rfc3164", "rfc5424", "common_log"}
+var validStyles = []string{"plain", "json"}
 var validTypes = []string{"stdout", "log", "gz"}
 
 // Option defines log generator options
 type Option struct {
 	Format    string
+	Style     string
 	Output    string
 	Type      string
 	Number    int
@@ -68,6 +71,7 @@ func errorExit(err error) {
 func defaultOptions() *Option {
 	return &Option{
 		Format:    "apache_common",
+		Style:     "plain",
 		Output:    "generated.log",
 		Type:      "stdout",
 		Number:    1000,
@@ -86,6 +90,14 @@ func ParseFormat(format string) (string, error) {
 		return "", fmt.Errorf("%s is not a valid format", format)
 	}
 	return format, nil
+}
+
+// ParseStyle validates the given format
+func ParseStyle(style string) (string, error) {
+	if !containString(validStyles, style) {
+		return "", fmt.Errorf("%s is not a valid style", style)
+	}
+	return style, nil
 }
 
 // ParseType validates the given type
@@ -145,6 +157,7 @@ func ParseOptions() *Option {
 	help := pflag.BoolP("help", "h", false, "Show usage")
 	version := pflag.BoolP("version", "v", false, "Show version")
 	format := pflag.StringP("format", "f", opts.Format, "Log format")
+	style := pflag.StringP("style", "y", opts.Style, "Style")
 	output := pflag.StringP("output", "o", opts.Output, "Output filename. Path-like filename is allowed")
 	logType := pflag.StringP("type", "t", opts.Type, "Log output type")
 	number := pflag.IntP("number", "n", opts.Number, "Number of lines to generate")
@@ -166,6 +179,9 @@ func ParseOptions() *Option {
 		os.Exit(0)
 	}
 	if opts.Format, err = ParseFormat(*format); err != nil {
+		errorExit(err)
+	}
+	if opts.Style, err = ParseStyle(*style); err != nil {
 		errorExit(err)
 	}
 	if opts.Type, err = ParseType(*logType); err != nil {
