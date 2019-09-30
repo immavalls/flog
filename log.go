@@ -16,9 +16,9 @@ const (
 	// ApacheErrorLog : [{timestamp}] [{module}:{severity}] [pid {pid}:tid {thread-id}] [client: %{client}] %{message}
 	ApacheErrorLog = "[%s] [%s:%s] [pid %d:tid %d] [client: %s] %s"
 	// RFC3164Log : <priority>{timestamp} {hostname} {application}[{pid}]: {message}
-	RFC3164Log = "<%d>%s %s %s[%d]: %s"
+	RFC3164Log = "%s %s %s[%d]: %s"
 	// RFC5424Log : <priority>{version} {iso-timestamp} {hostname} {application} {pid} {message-id} {structured-data} {message}
-	RFC5424Log = "<%d>%d %s %s %s %d ID%d %s %s"
+	RFC5424Log = "%s %s %s %d ID%d %s %s"
 	// CommonLogFormat : {host} {user-identifier} {auth-user-id} [{datetime}] "{method} {request} {protocol}" {response-code} {bytes}
 	CommonLogFormat = "%s - %s [%s] \"%s %s %s\" %d %d"
 )
@@ -78,7 +78,6 @@ func NewApacheErrorLog(t time.Time, logStyle string) string {
 func NewRFC3164Log(t time.Time, logStyle string) string {
 	return ApplyLogStyle(fmt.Sprintf(
 		RFC3164Log,
-		gofakeit.Number(0, 191),
 		t.Format(RFC3164),
 		strings.ToLower(gofakeit.Username()),
 		gofakeit.Word(),
@@ -91,8 +90,6 @@ func NewRFC3164Log(t time.Time, logStyle string) string {
 func NewRFC5424Log(t time.Time, logStyle string) string {
 	return ApplyLogStyle(fmt.Sprintf(
 		RFC5424Log,
-		gofakeit.Number(0, 191),
-		gofakeit.Number(1, 3),
 		t.Format(RFC5424),
 		gofakeit.DomainName(),
 		gofakeit.Word(),
